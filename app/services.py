@@ -105,7 +105,7 @@ class NotificatorService(Service):
     def _tick(self):
         stat = Distribution.get_day_statistic(datetime.utcnow().date())
         if not stat['first_ts']:
-            self.logger.info(f'No statistics')
+            self.logger.info('No statistics')
             return
 
         stat['balances'] = [
