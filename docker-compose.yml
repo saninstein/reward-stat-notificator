@@ -1,0 +1,40 @@
+version: '3.7'
+
+x-env-vars: &env-vars
+  POSTGRES_HOST: ${POSTGRES_HOST:-db}
+  POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+  POSTGRES_USER: ${POSTGRES_USER:-db_user}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+  POSTGRES_DB: ${POSTGRES_DB:-db}
+
+  LOGGING_LEVEL: ${LOGGING_LEVEL:-DEBUG}
+  ETH_RPC: ${ETH_RPC:-https://eth.llamarpc.com}
+  CONTRACT_ADDRESS: ${CONTRACT_ADDRESS:-0xaBE235136562a5C2B02557E1CaE7E8c85F2a5da0}
+  INITIAL_BLOCK: ${INITIAL_BLOCK:-18889166}
+
+  TG_BOT_TOKEN: ${TG_BOT_TOKEN}
+  TG_CHANEL_ID: ${TG_CHANEL_ID}
+
+  NOTIFY_INTERVAL_SECONDS: ${NOTIFY_INTERVAL_SECONDS:-14400}
+
+services:
+  app:
+    image: ${DOCKER_REGISTRY:-local}/app:latest
+    build:
+      context: ./
+      dockerfile: ./docker/app/Dockerfile
+    environment:
+      <<: *env-vars
+    command: bash -c "sleep 2 && alembic upgrade heads && python3 main.py"
+
+  db:
+    image: postgres:12-alpine
+    environment:
+      <<: *env-vars
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  db_data:
